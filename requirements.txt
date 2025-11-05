@@ -2,3 +2,4 @@ flask
 flask_sqlalchemy
 gunicorn
 flask_login
+tzdata

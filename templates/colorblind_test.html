@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Blindness Test - Vision Check</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      color: var(--text);
+      text-align: center;
+      background: radial-gradient(circle at top left, var(--bg-dark1) 0%, var(--bg-dark2) 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .test-container {
+      background: var(--card);
+      backdrop-filter: blur(var(--blur));
+      border-radius: 20px;
+      padding: 40px;
+      width: 400px;
+      box-shadow: 0 0 25px rgba(0,229,255,0.3);
+      animation: fadeIn 1s ease;
+    }
+
+    img {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      box-shadow: 0 0 20px rgba(0,229,255,0.2);
+    }
+
+    input {
+      width: 60%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      text-align: center;
+      margin-top: 8px;
+      background: rgba(255,255,255,0.08);
+      color: white;
+      font-size: 16px;
+    }
+
+    .progress {
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    button {
+      margin-top: 15px;
+    }
+
+    #timer {
+      margin-top: 10px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h2>🎨 Ishihara Color Blindness Test</h2>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+    <p>Plate <span id="plateNumber">1</span> / 10</p>
+    <img id="plateImage" src="" alt="Ishihara Plate">
+    <input id="answer" placeholder="Enter number">
+    <p id="timer">⏱️ 5s remaining</p>
+    <button class="glow-button" onclick="recordAnswer()">Next</button>
+  </div>
+
+  <script>
+    // Ishihara plates (random order each test)
+    const plates = [
+      "{{ url_for('static', filename='images/plate1.png') }}",
+      "{{ url_for('static', filename='images/plate2.png') }}",
+      "{{ url_for('static', filename='images/plate3.png') }}",
+      "{{ url_for('static', filename='images/plate4.png') }}",
+      "{{ url_for('static', filename='images/plate5.png') }}",
+      "{{ url_for('static', filename='images/plate6.png') }}",
+      "{{ url_for('static', filename='images/plate7.png') }}",
+      "{{ url_for('static', filename='images/plate8.png') }}",
+      "{{ url_for('static', filename='images/plate9.png') }}",
+      "{{ url_for('static', filename='images/plate10.png') }}"
+    ].sort(() => Math.random() - 0.5);
+
+    let current = 0;
+    let answers = [];
+    let timer = null;
+    let timeLeft = 5;
+    let startTime = 0;
+
+    function showNextPlate() {
+      if (current >= plates.length) {
+        localStorage.setItem("ishiharaAnswers", JSON.stringify(answers));
+        window.location.href = "{{ url_for('colorblind_report') }}";
+        return;
+      }
+
+      const img = document.getElementById("plateImage");
+      const plate = plates[current];
+      img.src = plate;
+      document.getElementById("plateNumber").textContent = current + 1;
+      document.getElementById("answer").value = "";
+
+      // reset timer
+      clearInterval(timer);
+      timeLeft = 12;
+      document.getElementById("timer").textContent = `⏱️ ${timeLeft}s remaining`;
+      startTime = Date.now();
+      timer = setInterval(updateTimer, 1000);
+
+      // update progress
+      const progress = ((current) / plates.length) * 100;
+      document.getElementById("progressBar").style.width = progress + "%";
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      document.getElementById("timer").textContent = `⏱️ ${timeLeft}s remaining`;
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        recordAnswer(true);
+      }
+    }
+
+    function recordAnswer(auto = false) {
+      const ans = document.getElementById("answer").value.trim();
+      const reaction = ((Date.now() - startTime) / 1000).toFixed(1);
+      const userAnswer = auto ? "No answer" : ans;
+      answers.push({
+        plate: plates[current],
+        answer: userAnswer,
+        reaction: reaction
+      });
+      current++;
+      showNextPlate();
+    }
+
+    showNextPlate();
+  </script>
+</body>
+</html>

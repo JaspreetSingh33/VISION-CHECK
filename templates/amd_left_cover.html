@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AMD Test - Right Eye</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .eye-cover-img {
+      width: 160px;
+      margin: 20px auto;
+      display: block;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,229,255,0.25);
+    }
+    .small {
+      font-size: 16px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card center">
+      <h1>Right Eye Test</h1>
+
+      <!-- 👁️ Instruction Image -->
+      <img src="{{ url_for('static', filename='images/right_open.png') }}" alt="Cover Left Eye" class="eye-cover-img">
+
+      <p class="small">
+        Please cover your <strong>left eye</strong> and look straight at the screen from about 80–100 cm away.
+      </p>
+      <p class="small">Press Start when ready.</p>
+
+      <div class="mt-3">
+        <a href="{{ url_for('amd_test', eye='Right') }}">
+          <button>Start Test</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

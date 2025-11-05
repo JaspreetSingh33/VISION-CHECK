@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Blindness Test - Left Eye Start</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    .start-container {
+      background: var(--card);
+      backdrop-filter: blur(var(--blur));
+      border-radius: 20px;
+      padding: 50px 40px;
+      text-align: center;
+      width: 90%;
+      max-width: 600px;
+      margin: 70px auto;
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+      animation: fadeIn 1.2s ease;
+    }
+
+    .start-title {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+      margin-bottom: 15px;
+    }
+
+    .start-instruction {
+      font-size: 17px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .eye-img {
+      width: 180px;
+      height: auto;
+      margin-bottom: 25px;
+      filter: drop-shadow(0 0 10px rgba(0,229,255,0.3));
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.9; }
+    }
+
+    .glow-button {
+      padding: 12px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+    }
+
+    .glow-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(155, 108, 255, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="start-container">
+    <h2 class="start-title">🎨 Color Blindness Test - Left Eye</h2>
+
+    <p class="start-instruction">
+      Now, please <strong>cover your right eye</strong> — we’ll test your <strong>left eye</strong> next.<br>
+      Make sure your screen brightness is comfortable and sit about 80–100 cm away from your display.
+    </p>
+
+    <img src="{{ url_for('static', filename='images/left_open.png') }}" alt="Left Eye Open" class="eye-img">
+
+    <p class="start-instruction">When ready, click below to start the Ishihara Plates Test for your left eye.</p>
+
+    <button class="glow-button" onclick="window.location.href='{{ url_for('colorblind_test') }}'">
+      Start Test ➜
+    </button>
+  </div>
+</body>
+</html>

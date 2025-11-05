@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Tumbling E — Vision Acuity Test</title>
+<style>
+  body{margin:0;background:radial-gradient(circle at center,#020b16 0%,#071a2d 100%);color:#e8f2ff;font-family:"Inter","Segoe UI",sans-serif;text-align:center;overflow:hidden;}
+  header{padding:16px 0 8px;}
+  h1{margin:0;font-size:36px;font-weight:900;background:linear-gradient(90deg,#00e5ff,#9b6cff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:glowPulse 3s ease-in-out infinite;}
+  @keyframes glowPulse{0%,100%{text-shadow:0 0 20px #00e5ff,0 0 40px #9b6cff;}50%{text-shadow:0 0 40px #9b6cff,0 0 60px #00e5ff;}}
+  .sub{opacity:.85;margin-top:4px;}
+  .stage{height:65vh;display:flex;align-items:center;justify-content:center;}
+  .whitebox{width:320px;height:320px;background:#fff;display:flex;align-items:center;justify-content:center;border-radius:12px;box-shadow:0 0 30px rgba(0,229,255,.4);animation:lightGlow 3s ease-in-out infinite;}
+  @keyframes lightGlow{0%,100%{box-shadow:0 0 35px rgba(0,229,255,.35);}50%{box-shadow:0 0 55px rgba(155,108,255,.5);}}
+  .whitebox.blink{animation:blinkBox .25s ease;}
+  @keyframes blinkBox{0%{background:#fff;}50%{background:#e3faff;}100%{background:#fff;}}
+  #letterE{width:180px;transition:none;}
+  .meta{margin-top:8px;font-size:16px;opacity:.9;min-height:22px;}
+  .controls{display:flex;justify-content:center;gap:12px;margin-top:10px;}
+  .btn{background:linear-gradient(90deg,#00e5ff,#9b6cff);border:none;border-radius:10px;padding:10px 18px;color:#000;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s;box-shadow:0 0 10px rgba(0,229,255,.3);}
+  .btn:hover{transform:scale(1.06);box-shadow:0 0 18px rgba(155,108,255,.6);}
+  #feedback{margin-top:12px;font-size:20px;font-weight:700;min-height:28px;}
+  #switchBtn{display:none;margin-top:24px;padding:12px 26px;font-size:18px;background:linear-gradient(90deg,#00e5ff,#9b6cff);border:none;border-radius:12px;color:#000;font-weight:800;box-shadow:0 0 20px rgba(0,229,255,.4);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease;}
+  #switchBtn:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(155,108,255,.6);}
+</style>
+</head>
+<body>
+  <header>
+    <h1>Tumbling E Test — {{ which_eye }} Eye</h1>
+    <div class="sub">Identify the facing direction (use arrow keys or buttons).</div>
+  </header>
+
+  <div class="stage">
+    <div class="whitebox" id="whitebox">
+      <img id="letterE" src="{{ url_for('static', filename='images/E.png') }}" alt="E">
+    </div>
+  </div>
+
+  <div class="meta" id="progress">Level 1 of 11 · Trial 1 of 5</div>
+
+  <div class="controls">
+    <button class="btn" data-dir="up">↑ Up</button>
+    <button class="btn" data-dir="left">← Left</button>
+    <button class="btn" data-dir="right">→ Right</button>
+    <button class="btn" data-dir="down">↓ Down</button>
+  </div>
+
+  <div id="feedback"></div>
+  <button id="switchBtn">Switch Eye</button>
+
+  <!-- Sounds -->
+  <audio id="beep" src="{{ url_for('static', filename='sounds/beep.mp3') }}"></audio>
+  <audio id="correct" src="{{ url_for('static', filename='sounds/correct.mp3') }}"></audio>
+  <audio id="wrong" src="{{ url_for('static', filename='sounds/wrong.mp3') }}"></audio>
+
+<script>
+const eSizes=[1.4544,1.16352,0.91627,0.7272,0.5816,0.4654,0.3636,0.2809,0.2057,0.1509,0.11];
+const MAR_VALUES=[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0]; // used to compute MAR_score
+const TOTAL_LEVELS=11,TRIALS_PER_LEVEL=5;
+const SHUFFLES_FOR=i=>i>=7?8:5;
+const BASE_E_PX=120;
+
+const eImg=document.getElementById("letterE"),
+      whitebox=document.getElementById("whitebox"),
+      feedback=document.getElementById("feedback"),
+      progress=document.getElementById("progress"),
+      beep=document.getElementById("beep"),
+      sndCorrect=document.getElementById("correct"),
+      sndWrong=document.getElementById("wrong"),
+      switchBtn=document.getElementById("switchBtn");
+
+const DIRS=["up","right","down","left"];
+let level=1,trial=1,currentDir="right",ready=false;
+const perLevelCorrect=Array(TOTAL_LEVELS).fill(0);
+const whichEye="{{ which_eye if which_eye else 'Left' }}";
+
+function setEDirection(d){const deg={right:0,down:90,left:180,up:270}[d];eImg.style.transform=`rotate(${deg}deg)`;}
+function sizeE(i){const px=Math.min(220,Math.round(BASE_E_PX*eSizes[i]));eImg.style.width=`${px}px`;}
+function updateProgress(){progress.textContent=`Level ${level} of ${TOTAL_LEVELS} · Trial ${trial} of ${TRIALS_PER_LEVEL}`;}
+
+async function invisibleShuffle(times){
+  ready=false;eImg.style.animation="blinkE .4s ease";beep.currentTime=0;beep.play().catch(()=>{});
+  let finalDir=DIRS[Math.floor(Math.random()*4)];
+  for(let i=0;i<times;i++){
+    let nd=DIRS[Math.floor(Math.random()*4)];
+    if(nd===finalDir) nd=DIRS[(DIRS.indexOf(nd)+1)%4];
+    finalDir=nd;await new Promise(r=>setTimeout(r,50));
+  }
+  currentDir=finalDir;setEDirection(currentDir);
+  setTimeout(()=>eImg.style.animation="",400);ready=true;
+}
+async function startTrial(){feedback.textContent="";sizeE(level-1);updateProgress();await invisibleShuffle(SHUFFLES_FOR(level-1));}
+
+// --- Compute MAR score from level-wise performance (same rule as earlier) ---
+function computeMAR(perLevel){
+  let bestMAR=0,missed=0,found=false;
+  for(let i=0;i<TOTAL_LEVELS;i++){
+    if(perLevel[i] < 3){ bestMAR = MAR_VALUES[i]; missed = TRIALS_PER_LEVEL - perLevel[i]; found=true; break; }
+  }
+  if(!found){ bestMAR = MAR_VALUES[TOTAL_LEVELS-1]; missed = 0; }
+  const MAR_score = +(bestMAR + 0.02*missed).toFixed(2);
+  return MAR_score;
+}
+
+// --- Save results to Flask session via /save_results ---
+async function saveResultsToServer(eye, mar, per_level){
+  try{
+    await fetch("{{ url_for('save_results') }}",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ eye, mar, per_level })
+    });
+  }catch(e){ console.error("Save failed:", e); }
+}
+
+async function finishTest(){
+  // Hide controls + progress
+  document.querySelector(".controls").style.display="none";
+  progress.style.display="none";
+
+  // Compute + save
+  const MAR_score = computeMAR(perLevelCorrect);
+  await saveResultsToServer(whichEye, MAR_score, perLevelCorrect);
+
+  // Show next action
+  switchBtn.style.display="inline-block";
+  if(whichEye==="Left"){
+    switchBtn.textContent="➡ Switch Eye";
+    switchBtn.onclick=()=>window.location.href="{{ url_for('tumbling_e_right_start') }}";
+  }else{
+    switchBtn.textContent="📄 View Report";
+    switchBtn.onclick=()=>window.location.href="{{ url_for('tumbling_e_report') }}";
+  }
+}
+
+async function advance(){
+  if(trial<TRIALS_PER_LEVEL) trial++;
+  else {
+    if(level<TOTAL_LEVELS){ level++; trial=1; }
+    else { await finishTest(); return; }
+  }
+  await startTrial();
+}
+function blinkBox(){whitebox.classList.add("blink");setTimeout(()=>whitebox.classList.remove("blink"),250);}
+
+function registerAnswer(ans){
+  if(!ready)return; ready=false; blinkBox();
+  if(ans===currentDir){ feedback.textContent="✅ Correct"; perLevelCorrect[level-1]++; sndCorrect.currentTime=0; sndCorrect.play().catch(()=>{}); }
+  else{ feedback.textContent="❌ Wrong"; sndWrong.currentTime=0; sndWrong.play().catch(()=>{}); }
+  setTimeout(advance,450);
+}
+
+document.addEventListener("keydown",e=>{
+  if(!ready)return;
+  if(e.key==="ArrowUp")registerAnswer("up");
+  if(e.key==="ArrowDown")registerAnswer("down");
+  if(e.key==="ArrowLeft")registerAnswer("left");
+  if(e.key==="ArrowRight")registerAnswer("right");
+});
+document.querySelectorAll(".btn").forEach(b=> b.addEventListener("click",()=> ready && registerAnswer(b.dataset.dir)));
+
+setEDirection("right"); startTrial();
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+/* 🌒 Vision Check — Gloomy Glass UI */
+
+:root {
+  --bg-dark1: #070b13;
+  --bg-dark2: #0e1624;
+  --card: rgba(255, 255, 255, 0.05);
+  --text: #e8f2ff;
+  --accent: #00e5ff;
+  --accent2: #9b6cff;
+  --shadow: rgba(0, 0, 0, 0.6);
+  --blur: 20px;
+}
+
+/* ---------- Base ---------- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+}
+
+body {
+  background: radial-gradient(circle at top left, var(--bg-dark1) 0%, var(--bg-dark2) 100%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Container ---------- */
+.container {
+  background: var(--card);
+  backdrop-filter: blur(var(--blur));
+  border-radius: 20px;
+  padding: 40px 35px;
+  text-align: center;
+  width: 340px;
+  box-shadow: 0 0 30px var(--shadow), 0 0 60px rgba(0, 229, 255, 0.1);
+  animation: fadeIn 1s ease;
+}
+
+.container h2 {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
+}
+
+/* ---------- Inputs ---------- */
+input {
+  width: 85%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  text-align: center;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---------- Button ---------- */
+button {
+  width: 85%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border: none;
+  color: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(155, 108, 255, 0.4);
+}
+
+/* ---------- Links ---------- */
+p {
+  margin-top: 18px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+a:hover {
+  color: var(--accent2);
+}
+
+/* ---------- Flash Messages ---------- */
+.flash {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.flash.success {
+  background: rgba(0, 255, 127, 0.25);
+  color: #9cffc9;
+  box-shadow: 0 0 15px rgba(0, 255, 127, 0.2);
+}
+
+.flash.danger {
+  background: rgba(255, 0, 0, 0.25);
+  color: #ff8b8b;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+}
+
+/* ---------- Animation ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- DASHBOARD STYLES ---------- */
+
+.dashboard-container {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text);
+  animation: fadeIn 1.2s ease;
+}
+
+/* ---------- Futuristic Title ---------- */
+.dashboard-title {
+  font-family: "Orbitron", "Poppins", sans-serif;
+  font-size: 60px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 5s linear infinite, glowPulse 3s ease-in-out infinite, slideFadeIn 1.2s ease;
+  text-shadow:
+    0 0 12px rgba(0, 229, 255, 0.25),
+    0 0 25px rgba(155, 108, 255, 0.15);
+  margin-bottom: 12px;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+@keyframes slideFadeIn {
+  0% { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 12px rgba(0, 229, 255, 0.25),
+      0 0 25px rgba(155, 108, 255, 0.15);
+  }
+  50% {
+    text-shadow:
+      0 0 25px rgba(0, 229, 255, 0.4),
+      0 0 45px rgba(155, 108, 255, 0.3);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ---------- Tagline ---------- */
+.dashboard-tagline {
+  font-size: 17px;
+  font-weight: 400;
+  opacity: 0.75;
+  letter-spacing: 1px;
+  margin-bottom: 45px;
+  font-style: italic;
+  animation: fadeIn 2s ease;
+}
+
+/* ---------- Test Grid ---------- */
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  gap: 30px;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto 50px;
+}
+
+.test-card {
+  background: var(--card);
+  backdrop-filter: blur(var(--blur));
+  border-radius: 18px;
+  padding: 25px;
+  transition: 0.4s;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.test-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Test Headings ---------- */
+.test-heading {
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+  transition: 0.3s;
+}
+
+.test1 {
+  background: linear-gradient(90deg, #00e5ff, #007aff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.test2 {
+  background: linear-gradient(90deg, #9b6cff, #ff6cfb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.test3 {
+  background: linear-gradient(90deg, #ffae42, #ffc7a3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.test4 {
+  background: linear-gradient(90deg, #7cf2a6, #00e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.test-card:hover .test-heading {
+  transform: scale(1.05);
+  text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+}
+
+/* ---------- Reports Card ---------- */
+.reports-card {
+  background: var(--card);
+  backdrop-filter: blur(var(--blur));
+  border-radius: 18px;
+  padding: 25px;
+  width: 320px;
+  margin: 0 auto;
+  transition: 0.4s;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.reports-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(155, 108, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- Logout Link ---------- */
+.logout-link {
+  display: inline-block;
+  margin-top: 30px;
+  color: #ff6b6b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.logout-link:hover {
+  color: #ff9b9b;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.4);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 700px) {
+  .dashboard-title { font-size: 42px; }
+  .test-grid { grid-template-columns: 1fr; }
+  .reports-card { width: 90%; }
+}
+
+/* ---------- AMD TEST (Amsler Grid) ---------- */
+.grid-pair {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+
+.grid-box {
+  background: var(--card);
+  backdrop-filter: blur(var(--blur));
+  border-radius: 16px;
+  padding: 15px;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.grid-box img {
+  width: 240px;
+  height: 240px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 0 10px rgba(0,229,255,0.2);
+}
+
+.grid-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0,229,255,0.3);
+}
+
+.amd-form {
+  max-width: 420px;
+  margin: 0 auto;
+  margin-top: 25px;
+  text-align: left;
+}
+
+.amd-form label {
+  display: block;
+  margin-top: 14px;
+  font-weight: 500;
+}
+
+.amd-form input[type="radio"] {
+  accent-color: #00e5ff;
+  margin-right: 6px;
+}
+
+.grid-wrapper {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.grid-wrapper img {
+  width: 300px;
+  height: 300px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.report-section {
+  background: var(--card);
+  backdrop-filter: blur(var(--blur));
+  border-radius: 16px;
+  padding: 25px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+}
+
+.report-section h2 {
+  font-size: 22px;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #7cf2a6, #00e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.report-section ul {
+  list-style: none;
+  padding: 0;
+  text-align: left;
+  line-height: 1.7;
+}
+
+.report-section li strong {
+  color: var(--accent);
+}

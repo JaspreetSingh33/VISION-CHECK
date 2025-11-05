@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Astigmatism Report | Vision Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+  body {
+    background: var(--bg-1, #0f1724);
+    color: #eaf6ff;
+    font-family: 'Poppins', sans-serif;
+    padding: 40px 25px;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 2.4em;
+    background: linear-gradient(90deg,#00e5ff,#9b6cff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 35px;
+  }
+
+  .eye-pair {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-bottom: 45px;
+  }
+
+  .eye-card {
+    background: rgba(255,255,255,0.06);
+    padding: 25px;
+    border-radius: 18px;
+    width: 340px;
+    box-shadow: 0 0 20px rgba(0,229,255,0.25);
+    text-align: left;
+  }
+
+  .eye-card h2 {
+    color: #00e5ff;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .eye-card p { margin: 6px 0; }
+
+  hr { border:0;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0; }
+
+  /* ⭐ SEVERITY METER ⭐ */
+  .meter-wrap {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    margin-top: 14px;
+    height: 14px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .meter-bar {
+    height: 100%;
+    width: 0;
+    border-radius: 12px;
+    transition: width .8s ease, background .8s ease;
+  }
+
+  /* Fill Colors */
+  .normal { background: #00e57a; width: 15%; }
+  .mild { background: #ffd73a; width: 45%; }
+  .moderate { background: #ff9d32; width: 75%; }
+  .severe { background: #ff4e6a; width: 100%; }
+
+  .summary-box {
+    background: rgba(255,255,255,0.05);
+    padding: 28px;
+    border-radius: 18px;
+    max-width: 780px;
+    margin: 0 auto 50px;
+    box-shadow: 0 0 20px rgba(0,229,255,0.25);
+    line-height: 1.6;
+  }
+
+  .summary-box h3 { margin-bottom: 10px; }
+
+  /* BUTTONS */
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    margin-top: 20px;
+  }
+
+  .btn {
+    background: linear-gradient(90deg,#00e5ff,#9b6cff);
+    color: #fff;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 32px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s ease;
+    min-width: 220px;
+  }
+
+  .btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 0 18px rgba(0,229,255,0.6);
+  }
+</style>
+</head>
+<body>
+
+<h1>🌗 Astigmatism Test Report</h1>
+
+<div class="eye-pair">
+
+  <!-- LEFT EYE CARD -->
+  <div class="eye-card">
+    <h2>👁 Left Eye</h2>
+    <p><strong>Q1:</strong> {{ left.q1 or '—' }}</p>
+    <p><strong>Q2:</strong> {{ left.q2 or '—' }}</p>
+    <p><strong>Q3:</strong> {{ left.q3 or '—' }}</p>
+    <p><strong>Q4:</strong> {{ left.q4 or '—' }}</p>
+    <hr>
+    <p><strong>Result:</strong> {{ left_result }}</p>
+
+    <!-- Severity Meter -->
+    <div class="meter-wrap">
+      <div class="meter-bar 
+      {% if 'Normal' in left_result %}normal
+      {% elif 'Mild' in left_result %}mild
+      {% elif 'Moderate' in left_result %}moderate
+      {% else %}severe{% endif %}">
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT EYE CARD -->
+  <div class="eye-card">
+    <h2>👁 Right Eye</h2>
+    <p><strong>Q1:</strong> {{ right.q1 or '—' }}</p>
+    <p><strong>Q2:</strong> {{ right.q2 or '—' }}</p>
+    <p><strong>Q3:</strong> {{ right.q3 or '—' }}</p>
+    <p><strong>Q4:</strong> {{ right.q4 or '—' }}</p>
+    <hr>
+    <p><strong>Result:</strong> {{ right_result }}</p>
+
+    <!-- Severity Meter -->
+    <div class="meter-wrap">
+      <div class="meter-bar 
+      {% if 'Normal' in right_result %}normal
+      {% elif 'Mild' in right_result %}mild
+      {% elif 'Moderate' in right_result %}moderate
+      {% else %}severe{% endif %}">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="summary-box">
+{% if 'Normal' in left_result and 'Normal' in right_result %}
+  <h3>✅ Both eyes appear normal.</h3>
+  <p>No significant astigmatism detected.</p>
+
+{% elif 'Mild' in left_result or 'Mild' in right_result %}
+  <h3>⚠️ Mild astigmatism detected.</h3>
+  <p>You may experience slight blur occasionally.</p>
+
+{% elif 'Moderate' in left_result or 'Moderate' in right_result %}
+  <h3>🟠 Moderate astigmatism likely.</h3>
+  <p>Consider scheduling an eye exam for corrective lenses.</p>
+
+{% else %}
+  <h3>🔴 Significant astigmatism detected.</h3>
+  <p>A professional eye checkup is strongly recommended.</p>
+{% endif %}
+</div>
+
+<div class="actions">
+  <a href="{{ url_for('view_reports') }}" class="btn">📊 View Past Reports</a>
+  <a href="{{ url_for('dashboard') }}" class="btn">🏠 Dashboard</a>
+</div>
+
+</body>
+</html>

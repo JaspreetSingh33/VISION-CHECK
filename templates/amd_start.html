@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AMD Test - Instructions</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Make container wider for AMD page only */
+    .container.amd-container {
+      width: 90%;
+      max-width: 900px;
+      padding: 40px;
+    }
+
+    .instruction-text {
+      max-width: 750px;
+      margin: 0 auto;
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .grid-pair {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 40px;
+      margin-top: 40px;
+      flex-wrap: nowrap; /* side-by-side on wide screen */
+    }
+
+    .grid-box {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 15px 20px;
+      text-align: center;
+      width: 50%;
+      backdrop-filter: blur(var(--blur));
+      transition: 0.3s;
+    }
+
+    .grid-box img {
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+
+    .grid-box p {
+      margin-top: 10px;
+      font-weight: 500;
+      font-size: 15px;
+      color: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      .grid-pair {
+        flex-wrap: wrap;
+      }
+      .grid-box {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container amd-container">
+    <div class="card center">
+      <h1>Age-Related Macular Degeneration (AMD)</h1>
+
+      <div class="instruction-text">
+        <p>
+          AMD affects the <strong>macula</strong> — the central part of your retina responsible for sharp, detailed vision.  
+          This test uses the <strong>Amsler Grid</strong> to help detect any areas of distortion, blurriness, or missing spots
+          that could indicate early symptoms of AMD.
+        </p>
+        <p>Below you can see how a normal person perceives the grid compared to someone with macular degeneration:</p>
+      </div>
+
+      <!-- Side-by-side Grid Comparison -->
+      <div class="grid-pair">
+        <div class="grid-box">
+          <img src="{{ url_for('static', filename='images/grid_normal.png') }}" alt="Normal Vision Grid">
+          <p>Normal Vision</p>
+        </div>
+        <div class="grid-box">
+          <img src="{{ url_for('static', filename='images/grid_amd.png') }}" alt="AMD Vision Grid">
+          <p>AMD-Affected Vision</p>
+        </div>
+      </div>
+
+      <!-- Next Button -->
+      <div class="mt-4" style="margin-top:35px;">
+        <a href="{{ url_for('amd_left_cover') }}"><button>Next</button></a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

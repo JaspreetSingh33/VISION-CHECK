@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Astigmatism – Left Eye Q2 | Vision Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background: var(--bg-1, #0f1724);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .card {
+      background: var(--card, rgba(255,255,255,0.05));
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      max-width: 650px;
+    }
+    h2 { margin-bottom: 20px; }
+    img {
+      width: 450px;
+      margin-bottom: 25px;
+      border-radius: 14px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+    button {
+  background: linear-gradient(90deg, #00e5ff, #9b6cff);
+  color: #fff;
+  border: none;
+  padding: 14px 30px;        /* Increased padding */
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 12px;
+  transition: 0.3s ease;
+  display: block;
+  width: 100%;
+  max-width: 350px;          /* Larger buttons */
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1rem;           /* Slightly larger text */
+}
+
+button:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 18px #00e5ff;
+}
+
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Left Eye – Question 2</h2>
+    <img src="{{ url_for('static', filename='images/astigmatism_clock.png') }}" alt="Astigmatism Chart 2">
+    <p>Observe this <strong>Astigmatism Clock</strong> carefully. How do the lines appear to you?</p>
+
+    <form method="POST">
+      <button type="submit" name="answer" value="distorted">I see distorted or blurred lines</button>
+      <button type="submit" name="answer" value="lighter_darker">I see lighter or darker lines</button>
+      <button type="submit" name="answer" value="normal">I see all lines normally</button>
+    </form>
+  </div>
+</body>
+</html>

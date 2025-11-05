@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tumbling E – Left Eye Preparation</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <!-- MediaPipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+  <style>
+    body {
+      text-align:center;
+      color:#e8f2ff;
+      background:#030b17;
+      font-family:"Inter","Segoe UI",sans-serif;
+      overflow:hidden;
+    }
+
+    .prep-wrap {
+      max-width:900px;
+      margin:30px auto;
+      padding:20px;
+      background:rgba(255,255,255,0.05);
+      border-radius:20px;
+      backdrop-filter:blur(15px);
+      box-shadow:0 0 25px rgba(0,0,0,0.5);
+      animation:fadeIn .8s ease;
+    }
+
+    h1 {
+      font-size:36px;
+      font-weight:800;
+      margin-bottom:10px;
+      background:linear-gradient(90deg,#00e5ff,#9b6cff);
+      -webkit-background-clip:text;
+      color:transparent;
+      -webkit-text-fill-color:transparent;
+    }
+
+    .img-box img {
+      width:160px;
+      border-radius:14px;
+      box-shadow:0 0 15px rgba(0,229,255,0.3);
+      margin-bottom:10px;
+    }
+
+    .flex-box {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .cam-box {
+      position:relative;
+      display:inline-block;
+      border-radius:14px;
+      overflow:hidden;
+      background:rgba(255,255,255,0.08);
+      box-shadow:0 0 15px rgba(0,0,0,0.4);
+      width:300px;
+      height:220px;
+    }
+
+    video, canvas {
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      border-radius:14px;
+      object-fit:cover;
+    }
+
+    .distance-panel {
+      width:230px;
+      text-align:left;
+      background:rgba(255,255,255,0.07);
+      border-radius:14px;
+      padding:15px 18px;
+      height:fit-content;
+      box-shadow:0 0 15px rgba(0,0,0,0.3);
+    }
+
+    .status {
+      font-size:26px;
+      font-weight:700;
+      text-shadow:0 0 10px rgba(0,229,255,0.8);
+      margin:0;
+    }
+
+    .status span {
+      display:block;
+      font-size:15px;
+      margin-top:5px;
+      opacity:0.85;
+    }
+
+    .status.good { color:#00ffb7; }
+    .status.close { color:#ff6c6c; }
+    .status.far { color:#ffd66c; }
+
+    .btn {
+      margin-top:20px;
+      padding:10px 28px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:18px;
+      background:linear-gradient(90deg,#00e5ff,#9b6cff);
+      color:#000;
+      transition:all .25s;
+      opacity:.5;
+    }
+
+    .btn.active {
+      opacity:1;
+      animation:pulseButton 1.8s infinite ease-in-out;
+      box-shadow:0 0 15px rgba(0,229,255,.6);
+    }
+
+    @keyframes pulseButton {
+      0%,100%{box-shadow:0 0 10px rgba(0,229,255,.4),0 0 20px rgba(155,108,255,.3);}
+      50%{box-shadow:0 0 25px rgba(0,229,255,.9),0 0 45px rgba(155,108,255,.6);}
+    }
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+  </style>
+</head>
+<body>
+  <div class="prep-wrap">
+    <h1>Tumbling E – Left Eye Preparation</h1>
+    <div class="img-box">
+      <img src="{{ url_for('static', filename='images/left_open.png') }}" alt="Left Eye Open Instruction">
+    </div>
+    <p>Close your <b>right eye</b> and sit approximately <b>100 cm</b> from the screen.</p>
+
+    <div class="flex-box">
+      <div class="cam-box">
+        <video id="video" autoplay playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+      <div class="distance-panel">
+        <p class="status">Measuring distance… <span></span></p>
+      </div>
+    </div>
+
+    <!-- ✅ FIXED Begin Test Button -->
+    <button class="btn" id="begin" disabled onclick="location.href='{{ url_for('tumbling_e_test') }}'">
+      Begin Test
+    </button>
+  </div>
+
+  <script>
+    const video=document.getElementById('video');
+    const overlay=document.getElementById('overlay');
+    const ctx=overlay.getContext('2d');
+    const btn=document.getElementById('begin');
+    const statusEl=document.querySelector('.status');
+    const subtextEl=statusEl.querySelector('span');
+    let baseDist=null;
+
+    const faceMesh=new FaceMesh({locateFile:(f)=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
+    faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true});
+
+    faceMesh.onResults(res=>{
+      overlay.width=video.videoWidth;
+      overlay.height=video.videoHeight;
+      ctx.clearRect(0,0,overlay.width,overlay.height);
+      if(!res.multiFaceLandmarks?.length)return;
+
+      const lm=res.multiFaceLandmarks[0];
+      const L=lm[33],R=lm[263];
+      const dx=(R.x-L.x)*overlay.width,dy=(R.y-L.y)*overlay.height;
+      const dist=Math.hypot(dx,dy);
+
+      if(!baseDist)baseDist=dist;
+      const ratio=baseDist/dist;
+      const cm=ratio*86;
+
+      statusEl.textContent=`Distance ≈ ${cm.toFixed(0)} cm`;
+      statusEl.appendChild(subtextEl);
+
+      if(cm>95&&cm<105){
+        statusEl.className="status good";
+        subtextEl.textContent="✅ Perfect distance!";
+        btn.disabled=false;
+        btn.classList.add("active");
+      }else if(cm<=95){
+        statusEl.className="status close";
+        subtextEl.textContent="🔴 Move slightly back.";
+        btn.disabled=true;
+        btn.classList.remove("active");
+      }else{
+        statusEl.className="status far";
+        subtextEl.textContent="🟡 Move slightly closer.";
+        btn.disabled=true;
+        btn.classList.remove("active");
+      }
+    });
+
+    async function startCamera(){
+      try{
+        const s=await navigator.mediaDevices.getUserMedia({video:true});
+        video.srcObject=s;
+        video.play();
+        new Camera(video,{onFrame:async()=>{await faceMesh.send({image:video});}}).start();
+      }catch(e){
+        alert('Camera permission required to measure distance.');
+        console.error(e);
+      }
+    }
+    startCamera();
+  </script>
+</body>
+</html>

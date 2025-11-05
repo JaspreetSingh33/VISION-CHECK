@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Astigmatism – Right Eye Q1 | Vision Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background: var(--bg-1, #0f1724);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .card {
+      background: var(--card, rgba(255,255,255,0.05));
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      max-width: 650px;
+    }
+    h2 { margin-bottom: 20px; }
+    img {
+      width: 380px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    }
+    button {
+      background: linear-gradient(90deg, #00e5ff, #9b6cff);
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px auto;
+      transition: 0.3s ease;
+      display: block;
+      width: 100%;
+      max-width: 300px;
+    }
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #00e5ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Right Eye – Question 1</h2>
+    <img src="{{ url_for('static', filename='images/Lines.png') }}" alt="Astigmatism Chart 1">
+    <p>Observe the <strong>Lines</strong> carefully. How do the lines appear to you?</p>
+
+    <form method="POST">
+      <button type="submit" name="answer" value="distorted">I see distorted or blurred lines</button>
+      <button type="submit" name="answer" value="lighter_darker">I see lighter or darker lines</button>
+      <button type="submit" name="answer" value="normal">I see all lines normally</button>
+    </form>
+  </div>
+</body>
+</html>

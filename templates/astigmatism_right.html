@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Astigmatism Test – Right Eye | Vision Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background: var(--bg-1, #0f1724);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card, rgba(255,255,255,0.05));
+      padding: 55px;
+      border-radius: 22px;
+      max-width: 800px;
+      width: 90%;
+      box-shadow: 0 0 25px rgba(0,0,0,0.45);
+    }
+
+    h1 {
+      font-size: 2em;
+      background: linear-gradient(90deg, #00e5ff, #9b6cff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      opacity: 0.9;
+    }
+
+    .eye-img {
+      width: 380px;
+      margin: 25px auto 35px;
+      display: block;
+      border-radius: 12px;
+      box-shadow: 0 0 14px rgba(255,255,255,0.3);
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #00e5ff, #9b6cff);
+      color: #fff;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      max-width: 350px;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 18px #00e5ff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Right Eye Test</h1>
+
+    <!-- ✅ Use right_eye instruction image -->
+    <img src="{{ url_for('static', filename='images/right_open.png') }}" class="eye-img" alt="Cover Left Eye">
+
+    <p>
+      Cover your <strong>left eye</strong> gently using your hand or a card.
+      Keep your right eye open and face the screen comfortably.
+    </p>
+
+    <p>
+      Ensure good lighting and your screen is at eye level.
+    </p>
+
+    <a href="{{ url_for('astigmatism_right_q', n=1) }}" class="btn">Start Test</a>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AMD Test - {{ eye }} Eye</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* make container wider for AMD test */
+    .container.amd-container {
+      width: 90%;
+      max-width: 850px;
+      padding: 40px 45px;
+    }
+
+    .grid-wrapper {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .grid-wrapper img {
+      width: 360px;
+      height: 360px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 0 25px rgba(0,229,255,0.25);
+    }
+
+    .question-section {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 25px;
+      text-align: left;
+      max-width: 650px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.05);
+      padding: 12px 16px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .question label {
+      flex: 1;
+      font-weight: 500;
+      font-size: 16px;
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* ✅ improved dropdown visibility */
+    .question select {
+      flex-basis: 200px;
+      background: rgba(15, 23, 36, 0.95); /* dark translucent */
+      color: #e8f2ff;                     /* light blue text */
+      border: 1px solid rgba(0,229,255,0.3);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 15px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      transition: 0.3s;
+    }
+
+    .question select:hover {
+      box-shadow: 0 0 10px rgba(0,229,255,0.3);
+    }
+
+    .question select option {
+      background: #0e1624;  /* dark dropdown panel */
+      color: #e8f2ff;       /* readable text */
+    }
+
+    .small {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-wrapper img {
+        width: 280px;
+        height: 280px;
+      }
+      .question {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .question select {
+        width: 100%;
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container amd-container">
+    <div class="card center">
+      <h1>AMD Test — {{ eye }} Eye</h1>
+      <p class="small">Focus on the <strong>black dot</strong> in the center of the grid and answer below:</p>
+
+      <!-- Enlarged Amsler Grid -->
+      <div class="grid-wrapper">
+        <img src="{{ url_for('static', filename='images/grid_normal.png') }}" alt="Amsler Grid">
+      </div>
+
+      <!-- Compact Inline Questions -->
+      <form id="amdForm" method="post" action="{{ url_for('amd_save') }}">
+        <input type="hidden" name="eye" value="{{ eye }}">
+
+        <div class="question-section">
+          <div class="question">
+            <label>1️⃣ What do you see?</label>
+            <select name="q1" required>
+              <option value="">Select one</option>
+              <option value="Darker areas">Darker or lighter areas</option>
+              <option value="Normal">All areas look normal</option>
+            </select>
+          </div>
+
+          <div class="question">
+            <label>2️⃣ Are any lines distorted or blurry?</label>
+            <select name="q2" required>
+              <option value="">Select one</option>
+              <option value="Distorted">Yes, distorted/blurry areas</option>
+              <option value="Normal">No, all lines are clear</option>
+            </select>
+          </div>
+
+          <div class="question">
+            <label>3️⃣ Can you see the grid lines clearly?</label>
+            <select name="q3" required>
+              <option value="">Select one</option>
+              <option value="All lines visible">Yes, all lines are visible</option>
+              <option value="Missing lines">Some lines seem missing</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4" style="text-align:center; margin-top:25px;">
+          <button type="submit">Submit Answers</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

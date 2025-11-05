@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Vision Acuity Report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+  :root{
+    --bg:#0b1424;
+    --panel:rgba(255,255,255,0.06);
+    --glass:rgba(255,255,255,0.08);
+    --text:#eaf6ff;
+    --cyan:#00e5ff;
+    --violet:#9b6cff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:radial-gradient(1200px 600px at 20% -10%, #061226, #0e1c33 40%, #0b1424 70%);
+    color:var(--text);font-family:"Inter","Segoe UI",sans-serif;line-height:1.45;
+  }
+  header{padding:22px 16px 10px;text-align:center}
+  h1{
+    margin:0;font-size:34px;font-weight:900;letter-spacing:.3px;
+    background:linear-gradient(90deg,var(--cyan),var(--violet));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    text-shadow:0 0 26px rgba(0,229,255,.28);
+    animation:glow 3s ease-in-out infinite;
+  }
+  @keyframes glow{0%,100%{text-shadow:0 0 20px rgba(0,229,255,.25)}50%{text-shadow:0 0 36px rgba(155,108,255,.45)}}
+  .sub{opacity:.85;margin-top:6px}
+
+  .toolbar{
+    display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 6px;
+  }
+  .btn{
+    padding:10px 18px;border:none;border-radius:12px;cursor:pointer;font-weight:750;
+    background:linear-gradient(90deg,var(--cyan),var(--violet));color:#001018;
+    box-shadow:0 0 14px rgba(0,229,255,.35);transition:transform .15s, box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-1px) scale(1.03);box-shadow:0 0 22px rgba(155,108,255,.55)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,.18);box-shadow:none}
+
+  .wrap{max-width:1100px;margin:0 auto;padding:16px}
+  .grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px;
+  }
+  .card{
+    background:var(--panel);border-radius:16px;padding:18px;backdrop-filter:blur(12px);
+    box-shadow:0 0 20px rgba(0,0,0,.35);
+  }
+  .card:hover{box-shadow:0 0 28px rgba(0,229,255,.25)}
+  h2{margin:0 0 10px;font-weight:800;color:var(--cyan);font-size:20px}
+  .kv{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 10px}
+  .pill{
+    padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.07);font-size:14px
+  }
+  .verdict{margin-top:8px;font-weight:800}
+  .desc{opacity:.9;margin-top:3px}
+  .levels{
+    margin-top:10px;background:rgba(255,255,255,.05);border-radius:12px;padding:10px;font-size:14px;color:#cfe6ff
+  }
+  .levels b{color:#9fd6ff}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:800;margin-left:6px}
+  .good    {background:rgba(0,255,150,.14);box-shadow:0 0 14px rgba(0,255,150,.28)}
+  .moderate{background:rgba(255,230,0,.12);box-shadow:0 0 14px rgba(255,230,0,.28)}
+  .poor    {background:rgba(255,50,95,.14); box-shadow:0 0 14px rgba(255,80,120,.34)}
+  .superior{background:rgba(0,240,255,.14); box-shadow:0 0 14px rgba(0,240,255,.34)}
+  .neutral {background:rgba(255,255,255,.08);}
+
+  .summary{
+    margin-top:18px;background:var(--glass);border-radius:16px;padding:16px 18px;
+  }
+  .warnline{margin:6px 0 0;padding:8px 10px;border-radius:10px;background:rgba(255,108,108,.12);border:1px solid rgba(255,108,108,.35);color:#ffd1d1;font-weight:700}
+  .okline{margin:6px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,255,150,.12);border:1px solid rgba(0,255,150,.28);color:#d7ffe9;font-weight:700}
+  .list{margin:6px 0 0;padding-left:18px}
+  .list li{margin:4px 0}
+  .footer-actions{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 6px;justify-content:center}
+
+  @media (max-width: 900px){
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Vision Acuity Report</h1>
+  <div class="sub">for <b>{{ name }}</b></div>
+
+  <div class="toolbar">
+    <button class="btn" id="dlPdfBtn">⬇ Download PDF</button>
+    <a class="btn ghost" href="{{ url_for('dashboard') }}">↩ Back to Dashboard</a>
+    <a class="btn ghost" href="{{ url_for('view_reports') }}">📜 View Past Reports</a>
+  </div>
+</header>
+
+<div class="wrap" id="reportRoot">
+  <div class="grid">
+    <!-- Left Eye -->
+    <div class="card {{ left_verdict[2] }}">
+      <h2>👁 Left Eye <span class="badge">{{ left_verdict[0] }}</span></h2>
+      <div class="kv">
+        <div class="pill"><b>MAR:</b> {{ left.mar if left.mar is not none else '—' }}</div>
+        <div class="pill"><b>Total Correct:</b> {{ left.total_correct }}/55</div>
+      </div>
+      <div class="verdict">{{ left_verdict[0] }}</div>
+      <div class="desc">{{ left_verdict[1] }}</div>
+      <div class="levels">
+        <b>Level-wise Correct (out of 5)</b><br/>
+        {% for c in left.per_level %}
+          Level {{ loop.index }} → {{ c }}/5<br/>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Eye -->
+    <div class="card {{ right_verdict[2] }}">
+      <h2>👁 Right Eye <span class="badge">{{ right_verdict[0] }}</span></h2>
+      <div class="kv">
+        <div class="pill"><b>MAR:</b> {{ right.mar if right.mar is not none else '—' }}</div>
+        <div class="pill"><b>Total Correct:</b> {{ right.total_correct }}/55</div>
+      </div>
+      <div class="verdict">{{ right_verdict[0] }}</div>
+      <div class="desc">{{ right_verdict[1] }}</div>
+      <div class="levels">
+        <b>Level-wise Correct (out of 5)</b><br/>
+        {% for c in right.per_level %}
+          Level {{ loop.index }} → {{ c }}/5<br/>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="summary">
+    <h2>🩺 Medical Summary</h2>
+    <div id="anisometropiaBox"></div>
+    <div id="summaryAdvice" class="okline" style="display:none"></div>
+    <ul class="list" id="adviceList"></ul>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn" id="dlPdfBtnBottom">⬇ Download PDF</button>
+    <a class="btn ghost" href="{{ url_for('dashboard') }}">↩ Back</a>
+  </div>
+</div>
+
+<script>
+const left  = {{ left  | tojson }};
+const right = {{ right | tojson }};
+const patientName = {{ name | tojson }};
+const leftVerd  = {{ left_verdict  | tojson }};
+const rightVerd = {{ right_verdict | tojson }};
+
+// --- Anisometropia detection ---
+const bothDone = left && right && left.mar !== null && right.mar !== null;
+const marDiff = bothDone ? Math.abs((left.mar || 0) - (right.mar || 0)) : 0;
+const tcDiff  = bothDone ? Math.abs((left.total_correct||0) - (right.total_correct||0)) : 0;
+
+const anisometropiaBox = document.getElementById('anisometropiaBox');
+if(bothDone){
+  if(marDiff >= 0.20 || tcDiff >= 8){
+    anisometropiaBox.innerHTML =
+      `<div class="warnline">⚠ Possible anisometropia detected (ΔMAR ≈ ${marDiff.toFixed(2)}, ΔCorrect = ${tcDiff}). 
+      Consider a comprehensive refraction test.</div>`;
+  } else {
+    anisometropiaBox.innerHTML =
+      `<div class="okline">✔ No significant inter-eye difference observed 
+      (ΔMAR ≈ ${marDiff.toFixed(2)}, ΔCorrect = ${tcDiff}).</div>`;
+  }
+} else {
+  anisometropiaBox.innerHTML =
+    `<div class="warnline" style="opacity:.85">ℹ Complete both eye tests to assess inter-eye differences.</div>`;
+}
+
+// --- Medical advice section ---
+const adviceBox = document.getElementById('summaryAdvice');
+const adviceList = document.getElementById('adviceList');
+
+function bucket(v){ return v && v[2] ? v[2] : 'neutral'; }
+const worse =
+    (bucket(leftVerd)==='poor' || bucket(rightVerd)==='poor') ? 'poor' :
+    (bucket(leftVerd)==='moderate' || bucket(rightVerd)==='moderate') ? 'moderate' :
+    (bucket(leftVerd)==='good' || bucket(rightVerd)==='good') ? 'good' :
+    (bucket(leftVerd)==='superior' || bucket(rightVerd)==='superior') ? 'superior' : 'neutral';
+
+let leadText = '';
+if(worse==='poor') leadText = 'Verdict: Clinical evaluation recommended.';
+else if(worse==='moderate') leadText = 'Verdict: Mild weakness; schedule an eye exam.';
+else if(worse==='good') leadText = 'Verdict: Normal acuity; keep annual checks.';
+else if(worse==='superior') leadText = 'Verdict: Excellent acuity.';
+else leadText = 'Verdict: Complete both eye tests for full assessment.';
+
+adviceBox.textContent = leadText;
+adviceBox.style.display = 'block';
+adviceBox.className = (worse==='poor' || worse==='moderate') ? 'warnline' : 'okline';
+
+const tips = [];
+if(worse==='poor' || worse==='moderate'){
+  tips.push('Get a refraction test to check for myopia, hyperopia, or astigmatism.');
+  tips.push('Follow the 20-20-20 rule: every 20 min, rest eyes for 20 sec, look 20 ft away.');
+  tips.push('Ensure good lighting and consistent screen distance during tests.');
+} else if(worse==='good' || worse==='superior'){
+  tips.push('Maintain annual eye check-ups.');
+  tips.push('Use adequate lighting during extended screen use.');
+  tips.push('Repeat tests if you notice clarity changes or headaches.');
+}
+adviceList.innerHTML = tips.map(t=>`<li>${t}</li>`).join('');
+
+// --- PDF Download ---
+async function downloadPDF(){
+  const root = document.getElementById('reportRoot');
+  const canvas = await html2canvas(root, {scale: 2, backgroundColor: '#0b1424'});
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jspdf.jsPDF('p','pt','a4');
+  const pageW = pdf.internal.pageSize.getWidth();
+  const ratio = canvas.height / canvas.width;
+  const imgW = pageW - 40;
+  const imgH = imgW * ratio;
+  pdf.addImage(imgData, 'PNG', 20, 20, imgW, imgH);
+  pdf.save(`VisionReport_${patientName || 'User'}.pdf`);
+}
+document.getElementById('dlPdfBtn').addEventListener('click', downloadPDF);
+document.getElementById('dlPdfBtnBottom').addEventListener('click', downloadPDF);
+</script>
+</body>
+</html>

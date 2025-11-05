@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AMD Test Report - Vision Check</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .report-container {
+      max-width: 950px;
+      margin: 50px auto;
+      text-align: center;
+      color: var(--text);
+      animation: fadeIn 1s ease;
+    }
+
+    .report-title {
+      font-size: 38px;
+      font-weight: 700;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #7cf2a6, #00e5ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px rgba(0,229,255,0.3);
+    }
+
+    .report-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .eye-report {
+      background: var(--card);
+      backdrop-filter: blur(var(--blur));
+      border-radius: 18px;
+      padding: 25px;
+      width: 420px;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+      text-align: left;
+    }
+
+    .eye-report h2 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .eye-report ul {
+      list-style: none;
+      padding: 0;
+      line-height: 1.8;
+    }
+
+    .eye-report li strong {
+      color: var(--accent);
+    }
+
+    .verdict {
+      margin-top: 12px;
+      font-weight: 600;
+      color: #9b6cff;
+      background: rgba(255,255,255,0.05);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(155,108,255,0.2);
+    }
+
+    /* Summary block */
+    .summary {
+      margin-top: 40px;
+      background: rgba(255,255,255,0.05);
+      padding: 25px 35px;
+      border-radius: 16px;
+      line-height: 1.8;
+      box-shadow: 0 0 25px rgba(0,229,255,0.1);
+      text-align: left;
+    }
+
+    .summary h3 {
+      background: linear-gradient(90deg, #9b6cff, #00e5ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .summary ul {
+      list-style: none;
+      padding: 0;
+      line-height: 1.7;
+    }
+
+    .summary li {
+      margin-bottom: 6px;
+    }
+
+    .btn-group {
+      margin-top: 35px;
+      text-align: center;
+    }
+
+    .btn-group a {
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    @media (max-width: 768px) {
+      .eye-report { width: 100%; }
+      .summary { padding: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="report-container">
+    <h1 class="report-title">AMD Test Report</h1>
+
+    <div class="report-grid">
+      <!-- Left Eye Report -->
+      <div class="eye-report">
+        <h2>👁️ Left Eye</h2>
+        <ul>
+          <li><strong>Darker/Lighter Areas:</strong> {{ left.q1 }}</li>
+          <li><strong>Distortion/Blurriness:</strong> {{ left.q2 }}</li>
+          <li><strong>Grid Line Visibility:</strong> {{ left.q3 }}</li>
+        </ul>
+        <div class="verdict">{{ left.verdict }}</div>
+      </div>
+
+      <!-- Right Eye Report -->
+      <div class="eye-report">
+        <h2>👁️ Right Eye</h2>
+        <ul>
+          <li><strong>Darker/Lighter Areas:</strong> {{ right.q1 }}</li>
+          <li><strong>Distortion/Blurriness:</strong> {{ right.q2 }}</li>
+          <li><strong>Grid Line Visibility:</strong> {{ right.q3 }}</li>
+        </ul>
+        <div class="verdict">{{ right.verdict }}</div>
+      </div>
+    </div>
+
+    <!-- Detailed Summary Section -->
+    <div class="summary">
+      <h3>🧠 Medical Analysis Summary</h3>
+      <ul>
+        <li><strong>Overall Interpretation:</strong> {{ summary_text }}</li>
+        <li><strong>Possible Condition:</strong> {{ condition }}</li>
+        <li><strong>Severity Level:</strong> {{ severity }}</li>
+        <li><strong>Recommended Action:</strong> {{ recommendation }}</li>
+        <li><strong>Professional Advice:</strong> {{ advice }}</li>
+      </ul>
+    </div>
+
+    <!-- Only one button now -->
+    <div class="btn-group">
+      <a href="{{ url_for('dashboard') }}"><button>Back to Dashboard</button></a>
+    </div>
+  </div>
+</body>
+</html>

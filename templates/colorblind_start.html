@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Blindness Test - Vision Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    .test-container {
+      background: var(--card);
+      backdrop-filter: blur(var(--blur));
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      width: 90%;
+      max-width: 700px;
+      margin: 50px auto;
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.25);
+      animation: fadeIn 1.2s ease;
+    }
+
+    .test-title {
+      font-size: 30px;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+      margin-bottom: 15px;
+    }
+
+    .test-description {
+      font-size: 16px;
+      opacity: 0.9;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .info-box {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    .info-box h3 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .info-box ul {
+      margin-left: 20px;
+      line-height: 1.5;
+    }
+
+    .glow-button {
+      padding: 12px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+    }
+
+    .glow-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(155, 108, 255, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-container">
+    <h2 class="test-title">🎨 Color Blindness Test</h2>
+
+    <p class="test-description">
+      This module contains <strong>two tests</strong> that together assess your color perception and help detect possible color vision deficiencies.
+    </p>
+
+    <div class="info-box">
+      <h3>1️⃣ Ishihara Plate Test</h3>
+      <p>The standard color vision test where you identify numbers hidden within colored dot patterns. This checks your general ability to differentiate between various colors.</p>
+    </div>
+
+    <div class="info-box">
+      <h3>2️⃣ Color-Type Sensitivity Test</h3>
+      <p>This test focuses on identifying specific color weaknesses such as:</p>
+      <ul>
+        <li><strong>🔴 Protanopia</strong> — difficulty perceiving red shades</li>
+        <li><strong>🟢 Deuteranopia</strong> — difficulty perceiving green shades</li>
+        <li><strong>🔵 Tritanopia</strong> — difficulty perceiving blue shades</li>
+      </ul>
+      <p>It helps determine which color range your eyes respond to differently.</p>
+    </div>
+
+    <p class="test-description">
+      When you’re ready, click “Proceed” to begin the preparation step before the first test.
+    </p>
+
+    <button class="glow-button" onclick="window.location.href='{{ url_for('colorblind_left_start') }}'">
+      Proceed ➜
+    </button>
+  </div>
+</body>
+</html>

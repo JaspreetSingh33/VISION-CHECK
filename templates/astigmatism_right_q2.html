@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Astigmatism – Right Eye Q2 | Vision Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      background: var(--bg-1, #0f1724);
+      color: #fff;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card, rgba(255,255,255,0.05));
+      padding: 55px;                 /* Bigger padding */
+      border-radius: 22px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.45);
+      max-width: 800px;              /* Wider box */
+      width: 90%;
+    }
+
+    h2 {
+      margin-bottom: 25px;
+      font-size: 1.7rem;
+    }
+
+    img {
+      width: 420px;                  /* Larger image */
+      margin-bottom: 35px;
+      border-radius: 14px;
+      box-shadow: 0 0 14px rgba(255,255,255,0.25);
+    }
+
+    p {
+      font-size: 1.15rem;
+      margin-bottom: 35px;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+
+    button {
+      background: linear-gradient(90deg, #00e5ff, #9b6cff);
+      color: #fff;
+      border: none;
+      padding: 14px 30px;           /* Larger buttons */
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 12px auto;
+      transition: 0.3s ease;
+      display: block;
+      width: 100%;
+      max-width: 350px;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 18px #00e5ff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Right Eye – Question 2</h2>
+
+    <img src="{{ url_for('static', filename='images/astigmatism_clock.png') }}" alt="Astigmatism Chart 2">
+
+    <p>Look at the <strong>Astigmatism Clock</strong> again. Do any appear darker, lighter, doubled, or blurred?</p>
+
+    <form method="POST">
+      <button type="submit" name="answer" value="distorted">I see distorted or blurred lines</button>
+      <button type="submit" name="answer" value="lighter_darker">I see lighter or darker lines</button>
+      <button type="submit" name="answer" value="normal">I see all lines normally</button>
+    </form>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Color Blindness Report - Vision Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      color: var(--text);
+      text-align: center;
+      background: radial-gradient(circle at top left, var(--bg-dark1) 0%, var(--bg-dark2) 100%);
+      min-height: 100vh;
+      padding: 40px 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .report-container {
+      width: 90%;
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 0 35px rgba(0, 229, 255, 0.15);
+      padding: 40px 50px;
+      backdrop-filter: blur(12px);
+      animation: fadeIn 1s ease;
+    }
+
+    .report-title {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00e5ff, #9b6cff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .verdict-box {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 14px;
+      padding: 25px;
+      margin-bottom: 35px;
+      box-shadow: 0 0 25px rgba(0,229,255,0.15);
+    }
+
+    .verdict-box h3 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .severity-bars {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 25px;
+    }
+
+    .bar-group { text-align: center; width: 280px; }
+    .bar-label { font-weight: 600; margin-bottom: 8px; }
+
+    .bar {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 10px;
+      border-radius: 6px;
+      transition: width 1s ease;
+    }
+
+    .plates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 25px;
+      justify-items: center;
+      margin-top: 30px;
+    }
+
+    .plate-card {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 14px;
+      padding: 18px;
+      transition: 0.3s;
+      width: 180px;
+    }
+
+    .plate-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.3);
+    }
+
+    .plate-card img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 8px;
+    }
+
+    .answer {
+      font-size: 14px;
+      opacity: 0.85;
+    }
+
+    .correct { color: #80ffb4; font-weight: 600; }
+    .wrong { color: #ff6b6b; font-weight: 600; }
+
+    .glow-button {
+      padding: 10px 35px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #00e5ff, #9b6cff);
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+      margin-top: 35px;
+    }
+
+    .glow-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(155, 108, 255, 0.4);
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <h1 class="report-title">🎨 Color Blindness Report</h1>
+    <p>Your Ishihara color vision test results are summarized below.</p>
+
+    <div class="verdict-box">
+      <h3 id="verdict-title">Analyzing results...</h3>
+      <p id="verdict-desc"></p>
+      <p id="score-line" style="margin-top:10px;opacity:0.85;"></p>
+
+      <div class="severity-bars">
+        <div class="bar-group">
+          <div class="bar-label">🔴 Protan (Red)</div>
+          <div class="bar"><div id="protanBar" class="bar-fill" style="background:#ff6b6b;width:0%"></div></div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-label">🟢 Deutan (Green)</div>
+          <div class="bar"><div id="deutanBar" class="bar-fill" style="background:#7cf2a6;width:0%"></div></div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-label">🔵 Tritan (Blue)</div>
+          <div class="bar"><div id="tritanBar" class="bar-fill" style="background:#7cb7ff;width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="plates-grid" id="platesGrid"></div>
+    <button class="glow-button" onclick="window.location.href='{{ url_for('dashboard') }}'">⬅ Back to Dashboard</button>
+  </div>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem('ishiharaAnswers') || "[]");
+    const grid = document.getElementById('platesGrid');
+
+    const correctMap = {
+      "plate1.png": "42", "plate2.png": "7", "plate3.png": "70",
+      "plate4.png": "2", "plate5.png": "15", "plate6.png": "74",
+      "plate7.png": "96", "plate8.png": "12", "plate9.png": "57", "plate10.png": "6"
+    };
+
+    const plateCategory = {
+      "plate1.png": "protan", "plate2.png": "deutan", "plate3.png": "tritan",
+      "plate4.png": "deutan", "plate5.png": "deutan", "plate6.png": "deutan",
+      "plate7.png": "protan", "plate8.png": "protan", "plate9.png": "protan", "plate10.png": "neutral"
+    };
+
+    let score = 0, totalReaction = 0;
+    let protanErrors = 0, deutanErrors = 0, tritanErrors = 0;
+    let protanPlates = 0, deutanPlates = 0, tritanPlates = 0;
+
+    data.forEach((item, idx) => {
+      const plateFile = item.plate.split("/").pop();
+      const correct = correctMap[plateFile];
+      const category = plateCategory[plateFile];
+      const userAns = item.answer.trim();
+      const isCorrect = userAns === correct;
+
+      if (category === "protan") protanPlates++;
+      if (category === "deutan") deutanPlates++;
+      if (category === "tritan") tritanPlates++;
+
+      if (!isCorrect) {
+        if (category === "protan") protanErrors++;
+        if (category === "deutan") deutanErrors++;
+        if (category === "tritan") tritanErrors++;
+      }
+
+      totalReaction += parseFloat(item.reaction || 0);
+      if (isCorrect) score++;
+
+      const card = document.createElement('div');
+      card.className = 'plate-card';
+      card.innerHTML = `
+        <img src="${item.plate}" alt="Plate ${idx + 1}">
+        <p class="answer">Your answer: <b class="${isCorrect ? 'correct' : 'wrong'}">${userAns || 'No answer'}</b></p>
+        <p class="answer">Correct answer: <b>${correct}</b></p>
+        <p class="answer">Reaction: ${item.reaction}s</p>
+      `;
+      grid.appendChild(card);
+    });
+
+    const avgReaction = totalReaction / data.length;
+    const deficiencyIndex = {
+      protan: Math.round((protanErrors / protanPlates) * 100) || 0,
+      deutan: Math.round((deutanErrors / deutanPlates) * 100) || 0,
+      tritan: Math.round((tritanErrors / tritanPlates) * 100) || 0
+    };
+
+    document.getElementById("protanBar").style.width = deficiencyIndex.protan + "%";
+    document.getElementById("deutanBar").style.width = deficiencyIndex.deutan + "%";
+    document.getElementById("tritanBar").style.width = deficiencyIndex.tritan + "%";
+
+    let verdictTitle, verdictDesc;
+    if (score >= 9) {
+      verdictTitle = "🟢 Normal Color Vision";
+      verdictDesc = "Excellent performance — your color vision appears normal.";
+    } else if (score >= 6) {
+      verdictTitle = "🟡 Mild Color Vision Deficiency";
+      verdictDesc = "You missed a few plates, suggesting mild color confusion.";
+    } else {
+      verdictTitle = "🔴 Significant Color Vision Deficiency";
+      verdictDesc = "You struggled with several plates — a professional evaluation is advised.";
+    }
+
+    const maxDef = Math.max(deficiencyIndex.protan, deficiencyIndex.deutan, deficiencyIndex.tritan);
+    let colorVerdict = "No notable color-axis weakness detected.";
+    if (maxDef >= 20) {
+      if (maxDef === deficiencyIndex.protan)
+        colorVerdict = `Possible Protanomaly (Red Weakness, ${deficiencyIndex.protan}% severity)`;
+      else if (maxDef === deficiencyIndex.deutan)
+        colorVerdict = `Possible Deuteranomaly (Green Weakness, ${deficiencyIndex.deutan}% severity)`;
+      else if (maxDef === deficiencyIndex.tritan)
+        colorVerdict = `Possible Tritanomaly (Blue Weakness, ${deficiencyIndex.tritan}% severity)`;
+    }
+
+    document.getElementById("verdict-title").textContent = verdictTitle;
+    document.getElementById("verdict-desc").innerHTML = verdictDesc + "<br><b>" + colorVerdict + "</b>";
+    document.getElementById("score-line").textContent =
+      `✅ Correct: ${score}/${data.length} | ⏱️ Avg Reaction: ${avgReaction.toFixed(1)}s`;
+
+    // ✅ Save report automatically to DB with error handling
+    fetch("/save_colorblind_results", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        score: score,
+        total: data.length,
+        avg_reaction: avgReaction,
+        verdict: colorVerdict,
+        protan: deficiencyIndex.protan,
+        deutan: deficiencyIndex.deutan,
+        tritan: deficiencyIndex.tritan
+      })
+    })
+    .then(res => res.json())
+    .then(res => console.log("ColorBlindness report saved:", res))
+    .catch(err => console.error("Save error:", err));
+  </script>
+</body>
+</html>

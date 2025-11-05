@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Vision Check</title>
+
+  <!-- Futuristic Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+  <div class="dashboard-container">
+
+    <!-- Animated Futuristic Title -->
+    <h1 class="dashboard-title">Vision Check</h1>
+    <p class="dashboard-tagline">Your personalized eye health hub.</p>
+
+    <!-- 2×2 Grid of Vision Tests -->
+    <div class="test-grid">
+
+      <!-- Tumbling E Test -->
+      <div class="test-card">
+        <h3 class="test-heading test1">🅴 Tumbling E Test</h3>
+        <p>Measure your visual acuity precision.</p>
+        <button class="btn" onclick="window.location.href='{{ url_for('tumbling_e_start') }}'">
+          Start Test
+        </button>
+      </div>
+
+      <!-- Astigmatism Test -->
+      <div class="test-card">
+        <h3 class="test-heading test2">🌗 Astigmatism Test</h3>
+        <p>Detect irregularities in your cornea or lens.</p>
+        <!-- ✅ Fixed URL name here -->
+        <button class="btn" onclick="window.location.href='{{ url_for('astigmatism_start') }}'">
+         Start Test
+        </button>
+
+      </div>
+
+      <!-- Color Blindness Test -->
+      <div class="test-card">
+        <h3 class="test-heading test3">🎨 Color Blindness Test</h3>
+        <p>Assess your color perception accuracy.</p>
+        <button class="btn" onclick="window.location.href='{{ url_for('colorblind_start') }}'">
+          Start Test
+        </button>
+      </div>
+
+      <!-- ✅ AMD Test -->
+      <div class="test-card">
+        <h3 class="test-heading test4">🧠 AMD Test</h3>
+        <p>Check for macular degeneration symptoms.</p>
+        <button class="btn" onclick="window.location.href='{{ url_for('amd_start') }}'">
+          Start Test
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Reports Section -->
+    <div class="reports-card">
+      <h3>📊 View Past Reports</h3>
+      <p>Track your previous vision assessments and progress.</p>
+      <button class="btn" onclick="window.location.href='{{ url_for('view_reports') }}'">
+        View Reports
+      </button>
+    </div>
+
+    <!-- Logout -->
+    <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+  </div>
+</body>
+</html>

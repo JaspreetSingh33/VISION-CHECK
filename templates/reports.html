@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Past Vision Reports</title>
+<style>
+body {
+  font-family: "Inter","Segoe UI",sans-serif;
+  background:#0f1724;
+  color:#eaf6ff;
+  margin:0;
+  padding:40px;
+  text-align:center;
+}
+h1 {
+  font-size:32px;
+  font-weight:800;
+  background:linear-gradient(90deg,#00e5ff,#9b6cff);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* FILTER BUTTONS */
+.filter-bar {
+  margin:25px auto 40px;
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  flex-wrap:wrap;
+}
+.filter-btn {
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(0,229,255,0.3);
+  color:#eaf6ff;
+  padding:10px 22px;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s ease;
+  box-shadow:0 0 8px rgba(0,229,255,0.15);
+}
+.filter-btn:hover {
+  background:linear-gradient(90deg,#00e5ff,#9b6cff);
+  color:#000;
+  box-shadow:0 0 18px rgba(155,108,255,0.4);
+}
+.filter-btn.active {
+  background:linear-gradient(90deg,#00e5ff,#9b6cff);
+  color:#000;
+  box-shadow:0 0 20px rgba(155,108,255,0.6);
+}
+
+/* Hide sections by default */
+.section{display:none;}
+.section.active{display:block;}
+
+/* REPORT STYLES */
+.report-card {
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  padding:20px;
+  margin:25px auto;
+  width:85%;
+  box-shadow:0 0 20px rgba(0,229,255,0.25);
+  text-align:left;
+}
+.eye-block {
+  display:flex;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  margin-top:15px;
+}
+.eye {
+  width:45%;
+  border-radius:14px;
+  padding:15px;
+  transition:transform 0.2s;
+  position:relative;
+}
+.eye:hover{transform:scale(1.03);}
+
+/* TOOLTIP */
+.tooltip {
+  visibility:hidden;
+  opacity:0;
+  position:absolute;
+  top:-12px;
+  right:15px;
+  background:rgba(0,0,0,0.85);
+  color:#fff;
+  padding:6px 10px;
+  border-radius:6px;
+  font-size:13px;
+  white-space:nowrap;
+  transition:opacity 0.3s ease;
+}
+.eye:hover .tooltip {
+  visibility:visible;
+  opacity:1;
+}
+
+/* Colors */
+.good{background:rgba(0,255,150,0.15);box-shadow:0 0 12px rgba(0,255,150,0.4);}
+.moderate{background:rgba(255,230,0,0.12);box-shadow:0 0 12px rgba(255,255,120,0.4);}
+.poor{background:rgba(255,0,60,0.15);box-shadow:0 0 12px rgba(255,80,100,0.5);}
+.superior{background:rgba(0,220,255,0.12);box-shadow:0 0 12px rgba(0,240,255,0.5);}
+.neutral{background:rgba(255,255,255,0.05);}
+
+/* Color Blindness */
+.cb-section h2{color:#ff9bff;margin-top:40px;}
+.cb-report {
+  background:rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:18px;
+  margin:15px auto;
+  width:80%;
+  box-shadow:0 0 18px rgba(155,108,255,0.25);
+}
+.cb-report strong{color:#00e5ff;}
+
+/* AMD */
+.amd-section h2{color:#7cf2a6;margin-top:40px;}
+.amd-pair {
+  display:flex;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  background:rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:18px;
+  margin:20px auto;
+  width:85%;
+  box-shadow:0 0 18px rgba(0,229,255,0.25);
+}
+.amd-eye {
+  width:45%;
+  padding:10px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.03);
+  box-shadow:0 0 12px rgba(0,229,255,0.15);
+}
+.amd-eye strong{color:#7cf2a6;}
+
+/* ASTIGMATISM */
+.astig-section h2{color:#00e5ff;margin-top:40px;}
+.astig-card {
+  background:rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:18px;
+  margin:15px auto;
+  width:80%;
+  box-shadow:0 0 18px rgba(0,229,255,0.25);
+  text-align:left;
+}
+.astig-card strong{color:#00e5ff;}
+
+/* Astigmatism paired layout */
+.astig-pair {
+  display:flex;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  background:rgba(255,255,255,0.06);
+  border-radius:14px;
+  padding:18px;
+  margin:20px auto;
+  width:85%;
+  box-shadow:0 0 18px rgba(0,229,255,0.25);
+}
+.astig-eye {
+  width:45%;
+  padding:10px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.03);
+  box-shadow:0 0 12px rgba(0,229,255,0.15);
+  text-align:left;
+}
+.astig-eye strong{color:#00e5ff;}
+.astig-eye h3{color:#00e5ff;margin-bottom:10px;}
+
+/* Buttons */
+.back-btn {
+  display:inline-block;
+  margin-top:40px;
+  background:linear-gradient(90deg,#00e5ff,#9b6cff);
+  color:#000;
+  padding:10px 22px;
+  border-radius:10px;
+  font-weight:700;
+  text-decoration:none;
+  box-shadow:0 0 10px rgba(0,229,255,0.3);
+  transition:all 0.3s ease;
+}
+.back-btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 20px rgba(155,108,255,0.5);
+}
+</style>
+</head>
+<body>
+<h1>📊 Past Vision Reports</h1>
+
+<!-- FILTER BUTTON BAR -->
+<div class="filter-bar">
+  <button class="filter-btn active" data-target="tumbling">🅴 Tumbling E</button>
+  <button class="filter-btn" data-target="colorblind">🎨 Color Blindness</button>
+  <button class="filter-btn" data-target="amd">🧠 AMD</button>
+  <button class="filter-btn" data-target="astigmatism">🌗 Astigmatism</button>
+</div>
+
+<!-- 🅴 Tumbling E Section -->
+<div id="tumbling" class="section active">
+{% if grouped_reports %}
+  {% for g in grouped_reports %}
+  <div class="report-card">
+    <h2>🅴 Tumbling E Test — {{ g.time }}</h2>
+    <div class="eye-block">
+
+      <!-- Left Eye -->
+      <div class="eye {{ g.left.verdict[2] }}">
+        <div class="tooltip">
+          {% if g.left.verdict[2]=='superior' %}
+            Vision ≈ 6/5 – Excellent clarity
+          {% elif g.left.verdict[2]=='good' %}
+            Vision ≈ 6/6 – Normal healthy
+          {% elif g.left.verdict[2]=='moderate' %}
+            Vision ≈ 6/9 – Minor blurriness
+          {% elif g.left.verdict[2]=='poor' %}
+            Vision ≈ 6/18 – Clinic check recommended
+          {% else %} No data {% endif %}
+        </div>
+        <h3>👁 Left Eye</h3>
+        <p><b>MAR:</b> {{ g.left.mar }}</p>
+        <p><b>Total Correct:</b> {{ g.left.total_correct }}/55</p>
+        <p><b>Verdict:</b> {{ g.left.verdict[0] }}</p>
+        <small>{{ g.left.verdict[1] }}</small>
+      </div>
+
+      <!-- Right Eye -->
+      <div class="eye {{ g.right.verdict[2] }}">
+        <div class="tooltip">
+          {% if g.right.verdict[2]=='superior' %}
+            Vision ≈ 6/5 – Excellent clarity
+          {% elif g.right.verdict[2]=='good' %}
+            Vision ≈ 6/6 – Normal healthy
+          {% elif g.right.verdict[2]=='moderate' %}
+            Vision ≈ 6/9 – Minor blurriness
+          {% elif g.right.verdict[2]=='poor' %}
+            Vision ≈ 6/18 – Clinic check recommended
+          {% else %} No data {% endif %}
+        </div>
+        <h3>👁 Right Eye</h3>
+        <p><b>MAR:</b> {{ g.right.mar }}</p>
+        <p><b>Total Correct:</b> {{ g.right.total_correct }}/55</p>
+        <p><b>Verdict:</b> {{ g.right.verdict[0] }}</p>
+        <small>{{ g.right.verdict[1] }}</small>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p>No Tumbling E reports available yet.</p>
+{% endif %}
+</div>
+
+<!-- 🎨 Color Blindness Section -->
+<div id="colorblind" class="section cb-section">
+  <h2>🎨 Color Blindness Test Reports</h2>
+  {% if color_reports and color_reports|length>0 %}
+    {% for c in color_reports %}
+    <div class="cb-report">
+      <h3>🗓️ {{ c.time }}</h3>
+      <p><strong>Verdict:</strong> {{ c.verdict }}</p>
+      <p><strong>Score:</strong> {{ c.score }}/{{ c.total }} | <strong>Avg Reaction:</strong> {{ c.avg_reaction }} s</p>
+      <p>🔴 Protan: {{ c.protan }} % | 🟢 Deutan: {{ c.deutan }} % | 🔵 Tritan: {{ c.tritan }} %</p>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="opacity:0.8;">No color blindness reports yet.</p>
+  {% endif %}
+</div>
+
+<!-- 🧠 AMD Section -->
+<div id="amd" class="section amd-section">
+  <h2>🧠 AMD (Amsler Grid) Reports</h2>
+  {% if amd_reports and amd_reports|length>0 %}
+    {% for i in range(0,amd_reports|length,2) %}
+    <div class="amd-pair">
+      <div class="amd-eye">
+        <h3>👁 {{ amd_reports[i].eye }} Eye — {{ amd_reports[i].time }}</h3>
+        <p><strong>Darker/Lighter Areas:</strong> {{ amd_reports[i].q1 }}</p>
+        <p><strong>Distortion/Blurriness:</strong> {{ amd_reports[i].q2 }}</p>
+        <p><strong>Grid Visibility:</strong> {{ amd_reports[i].q3 }}</p>
+        <p><strong>Classification:</strong> {{ amd_reports[i].classification }}</p>
+      </div>
+      {% if amd_reports|length>i+1 %}
+      <div class="amd-eye">
+        <h3>👁 {{ amd_reports[i+1].eye }} Eye — {{ amd_reports[i+1].time }}</h3>
+        <p><strong>Darker/Lighter Areas:</strong> {{ amd_reports[i+1].q1 }}</p>
+        <p><strong>Distortion/Blurriness:</strong> {{ amd_reports[i+1].q2 }}</p>
+        <p><strong>Grid Visibility:</strong> {{ amd_reports[i+1].q3 }}</p>
+        <p><strong>Classification:</strong> {{ amd_reports[i+1].classification }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="opacity:0.8;">No AMD reports yet.</p>
+  {% endif %}
+</div>
+
+<!-- 🌗 Astigmatism Section -->
+<div id="astigmatism" class="section astig-section">
+  <h2>🌗 Astigmatism Reports</h2>
+  {% if astig_reports and astig_reports|length>0 %}
+    {% for i in range(0,astig_reports|length,2) %}
+    <div class="astig-pair">
+      <div class="astig-eye">
+        <h3>👁 {{ astig_reports[i].eye }} Eye — {{ astig_reports[i].time }}</h3>
+        <p><strong>Q1:</strong> {{ astig_reports[i].q1 or '—' }}</p>
+        <p><strong>Q2:</strong> {{ astig_reports[i].q2 or '—' }}</p>
+        <p><strong>Q3:</strong> {{ astig_reports[i].q3 or '—' }}</p>
+        <p><strong>Q4:</strong> {{ astig_reports[i].q4 or '—' }}</p>
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;">
+        <p><strong>Result:</strong> {{ astig_reports[i].classification }}</p>
+      </div>
+      {% if astig_reports|length>i+1 %}
+      <div class="astig-eye">
+        <h3>👁 {{ astig_reports[i+1].eye }} Eye — {{ astig_reports[i+1].time }}</h3>
+        <p><strong>Q1:</strong> {{ astig_reports[i+1].q1 or '—' }}</p>
+        <p><strong>Q2:</strong> {{ astig_reports[i+1].q2 or '—' }}</p>
+        <p><strong>Q3:</strong> {{ astig_reports[i+1].q3 or '—' }}</p>
+        <p><strong>Q4:</strong> {{ astig_reports[i+1].q4 or '—' }}</p>
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.2);margin:10px 0;">
+        <p><strong>Result:</strong> {{ astig_reports[i+1].classification }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% else %}
+    <p style="opacity:0.8;">No astigmatism reports yet.</p>
+  {% endif %}
+  <footer style="margin-top:25px;color:#aaa;font-size:0.9rem;">
+    ⚠️ <em>Note:</em> Astigmatism results are <strong>for screening purposes only</strong> and do not replace a professional eye exam.
+  </footer>
+</div>
+
+<a href="{{ url_for('dashboard') }}" class="back-btn">← Back to Dashboard</a>
+
+<script>
+const buttons=document.querySelectorAll('.filter-btn');
+const sections=document.querySelectorAll('.section');
+buttons.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    buttons.forEach(b=>b.classList.remove('active'));
+    sections.forEach(sec=>sec.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.target).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

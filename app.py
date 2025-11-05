@@ -2,6 +2,9 @@ from flask import Flask, render_template, redirect, url_for, session, flash, req
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 import os, re, json
+from zoneinfo import ZoneInfo
+
+IST = ZoneInfo("Asia/Kolkata")
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -83,6 +86,15 @@ def classify_amd(q1, q2, q3):
     elif q1 == "Darker areas":
         return "Mild irregularity detected"
     return "Normal macular function"
+
+def to_ist(dt):
+    if not dt:
+        return ""
+    # If timestamp is naive (no timezone), assume it is UTC
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt.astimezone(IST).strftime('%Y-%m-%d %H:%M')
+
 
 # ---------------- AUTH ----------------
 @app.route('/')
@@ -522,7 +534,7 @@ def view_reports():
             verdict = classify_eye(rep.mar, rep.total_correct)
             return {'mar':rep.mar or 0,'total_correct':rep.total_correct or 0,'verdict':verdict}
         formatted.append({
-            'time': g['time'].strftime('%Y-%m-%d %H:%M'),
+            'time': to_ist(g['time']),
             'left': safe_parse(g['left']),
             'right': safe_parse(g['right'])
         })
@@ -530,7 +542,7 @@ def view_reports():
     # Color Blindness list
     color_qs = ColorReport.query.filter_by(user_id=session['user_id']).order_by(ColorReport.created_at.desc()).all()
     color_reports = [{
-        'time': c.created_at.strftime('%Y-%m-%d %H:%M'),
+        'time': to_ist(c.created_at),
         'score': c.score, 'total': c.total,
         'avg_reaction': round(c.avg_reaction or 0, 1),
         'verdict': c.verdict,
@@ -540,7 +552,7 @@ def view_reports():
     # AMD list
     amd_qs = AMDReport.query.filter_by(user_id=session['user_id']).order_by(AMDReport.created_at.desc()).all()
     amd_reports = [{
-        'time': a.created_at.strftime('%Y-%m-%d %H:%M'),
+        'time': to_ist(a.created_at),
         'eye': a.eye,
         'q1': a.q1, 'q2': a.q2, 'q3': a.q3,
         'classification': a.classification
@@ -556,7 +568,7 @@ def view_reports():
                 .order_by(AstigmatismReport.created_at.desc())
                 .all())
     astig_reports = [{
-        'time': a.created_at.strftime('%Y-%m-%d %H:%M'),
+        'time': to_ist(a.created_at),
         'eye': a.eye,
         'q1': a.q1, 'q2': a.q2, 'q3': a.q3, 'q4': a.q4,
         'classification': a.classification
@@ -573,11 +585,8 @@ def view_reports():
 
 
 # ---------------- RUN ----------------
-import os
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
-
+    app.run(debug=True)
 

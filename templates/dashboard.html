@@ -4,72 +4,177 @@
   <meta charset="UTF-8">
   <title>Dashboard - Vision Check</title>
 
-  <!-- Futuristic Font -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    /* Popup Background */
+    .popup-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    /* Popup Box */
+    .popup-box {
+      background: #0b0f1a !important;
+      border: 2px solid #00d4ff;
+      border-radius: 14px;
+      width: 420px;
+      max-height: 75vh;
+      overflow-y: auto;
+      padding: 20px;
+      color: white !important;
+      box-shadow: 0 0 25px #00eaff;
+      animation: popupFade 0.3s ease;
+    }
+
+    @keyframes popupFade {
+      from { opacity: 0; transform: scale(0.85); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Close Button */
+    .close-btn {
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 5px;
+      background: #ff3b3b;
+      color: white;
+      border: none;
+    }
+
+    .clinic-item {
+      border: 1px solid #00bfff;
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+      background: #11182a !important;
+      color: white !important;
+    }
+  </style>
 </head>
 
 <body>
   <div class="dashboard-container">
 
-    <!-- Animated Futuristic Title -->
     <h1 class="dashboard-title">Vision Check</h1>
     <p class="dashboard-tagline">Your personalized eye health hub.</p>
 
-    <!-- 2×2 Grid of Vision Tests -->
+    <!-- Tests -->
     <div class="test-grid">
 
-      <!-- Tumbling E Test -->
       <div class="test-card">
         <h3 class="test-heading test1">🅴 Tumbling E Test</h3>
         <p>Measure your visual acuity precision.</p>
-        <button class="btn" onclick="window.location.href='{{ url_for('tumbling_e_start') }}'">
-          Start Test
-        </button>
+        <button class="btn" onclick="window.location.href='{{ url_for('tumbling_e_start') }}'">Start Test</button>
       </div>
 
-      <!-- Astigmatism Test -->
       <div class="test-card">
         <h3 class="test-heading test2">🌗 Astigmatism Test</h3>
         <p>Detect irregularities in your cornea or lens.</p>
-        <!-- ✅ Fixed URL name here -->
-        <button class="btn" onclick="window.location.href='{{ url_for('astigmatism_start') }}'">
-         Start Test
-        </button>
-
+        <button class="btn" onclick="window.location.href='{{ url_for('astigmatism_start') }}'">Start Test</button>
       </div>
 
-      <!-- Color Blindness Test -->
       <div class="test-card">
         <h3 class="test-heading test3">🎨 Color Blindness Test</h3>
         <p>Assess your color perception accuracy.</p>
-        <button class="btn" onclick="window.location.href='{{ url_for('colorblind_start') }}'">
-          Start Test
-        </button>
+        <button class="btn" onclick="window.location.href='{{ url_for('colorblind_start') }}'">Start Test</button>
       </div>
 
-      <!-- ✅ AMD Test -->
       <div class="test-card">
         <h3 class="test-heading test4">🧠 AMD Test</h3>
         <p>Check for macular degeneration symptoms.</p>
-        <button class="btn" onclick="window.location.href='{{ url_for('amd_start') }}'">
-          Start Test
-        </button>
+        <button class="btn" onclick="window.location.href='{{ url_for('amd_start') }}'">Start Test</button>
       </div>
 
     </div>
 
-    <!-- Reports Section -->
-    <div class="reports-card">
+    <!-- Past Reports -->
+    <div class="reports-card" style="margin-top: 40px;">
       <h3>📊 View Past Reports</h3>
       <p>Track your previous vision assessments and progress.</p>
-      <button class="btn" onclick="window.location.href='{{ url_for('view_reports') }}'">
-        View Reports
-      </button>
+      <button class="btn" onclick="window.location.href='{{ url_for('view_reports') }}'">View Reports</button>
     </div>
 
-    <!-- Logout -->
+    <div style="height: 30px;"></div>
+
+    <!-- Find Clinics -->
+    <div class="reports-card">
+      <h3>🏥 Nearby Eye Clinics</h3>
+      <p>Get recommendations for qualified eye clinics near your location.</p>
+      <button class="btn" onclick="openPopup()">Find Clinics Near Me</button>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup-overlay" id="clinicPopup">
+      <div class="popup-box">
+        <button class="close-btn" onclick="closePopup()">✖</button>
+        <h2 style="margin-top: 5px;">Nearby Clinics</h2>
+        <div id="clinic-results"></div>
+      </div>
+    </div>
+
+    <script>
+      function openPopup() {
+        document.getElementById("clinicPopup").style.display = "flex";
+        getClinics();
+      }
+
+      function closePopup() {
+        document.getElementById("clinicPopup").style.display = "none";
+      }
+
+      function getClinics() {
+        if (!navigator.geolocation) {
+          alert("Geolocation not supported by your browser");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error);
+
+        function success(pos) {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          fetch("/nearby_clinics", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({lat: lat, lon: lon})
+          })
+          .then(res => res.json())
+          .then(data => {
+            let html = "";
+            data.clinics.forEach(c => {
+              html += `
+                <div class="clinic-item">
+                  <strong>${c.name}</strong><br>
+                  ${c.address}<br>
+                  Distance: ${c.distance} km<br>
+                  <a href="${c.map_url}" target="_blank" style="color:#00eaff;">📍 Open in Maps</a>
+                </div>
+              `;
+            });
+            document.getElementById("clinic-results").innerHTML = html;
+          });
+        }
+
+        function error() {
+          alert("Unable to get your location.");
+        }
+      }
+    </script>
+
     <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+
   </div>
 </body>
 </html>

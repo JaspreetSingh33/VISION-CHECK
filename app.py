@@ -4,7 +4,9 @@ from datetime import datetime
 import os, re, json
 from zoneinfo import ZoneInfo
 
+from zoneinfo import ZoneInfo
 IST = ZoneInfo("Asia/Kolkata")
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -119,18 +121,29 @@ def login():
 def register():
     if request.method == 'POST':
         name = request.form['name'].strip()
-        email = request.form['email'].strip()
+        email_raw = request.form['email'].strip()          # original email
+        email_check = email_raw.lower()                    # convert only for checking
         password = request.form['password'].strip()
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered.', 'danger')
-            return redirect(url_for('login'))
-        new_user = User(name=name, email=email, password=password)
+
+        # Case-insensitive check
+        existing = User.query.filter(
+            db.func.lower(User.email) == email_check
+        ).first()
+
+        if existing:
+            flash('Email already exists.', 'danger')
+            return redirect(url_for('register'))
+
+        # Save original casing of email into DB
+        new_user = User(name=name, email=email_raw, password=password)
         db.session.add(new_user)
         db.session.commit()
+
         session['user_id'] = new_user.id
         session['user_name'] = new_user.name
         return redirect(url_for('dashboard'))
     return render_template('register.html')
+
 
 @app.route('/logout')
 def logout():
@@ -582,6 +595,62 @@ def view_reports():
         astig_reports=astig_reports,   # <— added here
         name=session.get('user_name', 'User'))
 
+@app.route('/nearby_clinics', methods=['POST'])
+def nearby_clinics():
+    data = request.json
+    lat = data.get("lat")
+    lon = data.get("lon")
+
+    # Real Eye Clinics in Patiala
+    clinics = [
+        {
+            "name": "Amar Hospital – Eye Department",
+            "address": "Income Tax Office Road, Bank Colony, Patiala",
+            "distance": 1.2,
+            "map_url": "https://maps.google.com/?q=Amar+Hospital+Patiala"
+        },
+        {
+            "name": "Garg Eye Hospital (NABH Accredited)",
+            "address": "Sirhind Road, Patiala",
+            "distance": 2.5,
+            "map_url": "https://maps.google.com/?q=Garg+Eye+Hospital+Patiala"
+        },
+        {
+            "name": "Bansal Eye Hospital & Laser Centre",
+            "address": "41, Bank Colony, Khalsa College Road, Patiala",
+            "distance": 1.8,
+            "map_url": "https://maps.google.com/?q=Bansal+Eye+Hospital+Patiala"
+        },
+        {
+            "name": "Dr. G.S. Randhawa Eye Hospital (LJ Eye Institute)",
+            "address": "Fateh Colony, Sanauri Adda Road, Patiala",
+            "distance": 3.0,
+            "map_url": "https://maps.google.com/?q=Randhawa+Eye+Hospital+Patiala"
+        },
+        {
+            "name": "NETRA PRAKASH EYE CENTRE",
+            "address": "Urban Estate Phase-2, Patiala",
+            "distance": 3.4,
+            "map_url": "https://maps.google.com/?q=Navdeep+Eye+Centre+Patiala"
+        },
+        {
+            "name": "Lenskart – Leela Bhawan",
+            "address": "SCO 79, Ground Floor, Leela Bhawan, Patiala",
+            "distance": 1.0,
+            "map_url": "https://maps.google.com/?q=Lenskart+Leela+Bhawan+Patiala"
+        },
+        {
+            "name": "Dr. K.P. Singh Eye Clinic",
+            "address": "22 No. Phatak Road, Patiala",
+            "distance": 1.3,
+            "map_url": "https://maps.google.com/?q=KP+Singh+Eye+Clinic+Patiala"
+        },
+    ]
+
+    # Sort by nearest distance
+    clinics_sorted = sorted(clinics, key=lambda x: x["distance"])
+
+    return jsonify({"clinics": clinics_sorted})
 
 
 # ---------------- RUN ----------------
